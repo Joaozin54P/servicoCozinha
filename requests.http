@@ -1,0 +1,69 @@
+### Requisicoes para testar o servicoCozinha (IntelliJ: clique no botao verde ao lado de cada uma)
+### Chamam o GATEWAY (8080). Suba: servicoLogin (8085), servicoCozinha (8084) e o gateway (8080).
+### O IntelliJ guarda o cookie "token" do login e reenvia sozinho. Rode na ordem.
+
+### 1) Login como ADMIN
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{ "email": "admin@lanchonete.com", "senha": "admin123" }
+
+### 2) Recebe um pedido aprovado "na mao" (so ADMIN; em producao ele chega pela fila pedido-criado) -> 201
+POST http://localhost:8080/cozinha/pedidos
+Content-Type: application/json
+
+{
+  "pedidoId": 1,
+  "senhaRetirada": "001",
+  "clienteId": 5,
+  "observacao": "sem guardanapo",
+  "criadoEm": "2026-10-01T12:00:00",
+  "itens": [
+    { "nomeProduto": "Burger Bacon", "quantidade": 2, "adicionais": ["Bacon extra"], "observacao": "sem cebola" },
+    { "nomeProduto": "Refrigerante", "quantidade": 1 }
+  ]
+}
+
+### 3) Mesmo pedido de novo -> 200 e o MESMO pedido (nada e duplicado)
+POST http://localhost:8080/cozinha/pedidos
+Content-Type: application/json
+
+{
+  "pedidoId": 1,
+  "senhaRetirada": "001",
+  "clienteId": 5,
+  "itens": [ { "nomeProduto": "Burger Bacon", "quantidade": 2 } ]
+}
+
+### 4) Fila de trabalho (NA_FILA e EM_PREPARO, mais antigos primeiro)
+GET http://localhost:8080/cozinha/pedidos
+
+### 5) Comecei a preparar -> EM_PREPARO
+POST http://localhost:8080/cozinha/pedidos/1/iniciar
+
+### 6) Ficou pronto -> PRONTO
+POST http://localhost:8080/cozinha/pedidos/1/pronto
+
+### 7) Ja pronto: nao pode "iniciar" de novo -> 400
+POST http://localhost:8080/cozinha/pedidos/1/iniciar
+
+### 8) Pedidos prontos
+GET http://localhost:8080/cozinha/pedidos?status=PRONTO
+
+### 9) Um pedido que a cozinha nao conhece -> 404
+GET http://localhost:8080/cozinha/pedidos/999
+
+### 10) Cliente comum nao entra na cozinha -> 403 (cadastra e faz login como cliente)
+POST http://localhost:8080/auth/registrar
+Content-Type: application/json
+
+{ "nome": "Ana", "email": "ana@x.com", "senha": "123" }
+
+###
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{ "email": "ana@x.com", "senha": "123" }
+
+###
+GET http://localhost:8080/cozinha/pedidos

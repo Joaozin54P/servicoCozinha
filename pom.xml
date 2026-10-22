@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>servico-cozinha</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>servicoCozinha</name>
+    <description>Servico da cozinha: recebe os pedidos aprovados, mantem a fila de preparo e avisa o servicoPedido quando o status muda</description>
+
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
+    <!-- o projeto e dividido em dois modulos: -->
+    <modules>
+        <module>domain</module>   <!-- regras de negocio, Java puro (sem Spring) -->
+        <module>spring</module>   <!-- API REST, banco H2, RabbitMQ: tudo que usa o Spring -->
+    </modules>
+</project>
